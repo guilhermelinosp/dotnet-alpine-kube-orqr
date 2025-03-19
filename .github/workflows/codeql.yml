@@ -1,22 +1,20 @@
-name: CodeQL Analysis
-
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
   schedule:
-    - cron: '28 8 * * 4'
+    - cron: "28 8 * * 4"
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
 
 jobs:
   analyze:
-    name: Analyze (${{ matrix.language }})
+    name: analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      packages: read
-      actions: read
-      contents: read
 
     strategy:
       fail-fast: false
@@ -26,28 +24,21 @@ jobs:
             build-mode: none
           - language: csharp
             build-mode: autobuild
+          # Add more languages as needed, e.g.:
+          # - language: javascript-typescript
+          #   build-mode: autobuild
+          # - language: python
+          #   build-mode: none
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup .NET SDK
-        if: matrix.language == 'csharp'
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-          cache: true
-          cache-dependency-path: '**/*.csproj'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-
-      - name: Build C# project
-        if: matrix.language == 'csharp' && matrix.build-mode == 'autobuild'
-        run: dotnet build --configuration Release
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
