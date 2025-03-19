@@ -1,15 +1,31 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine3.18 AS build
+ARG TARGETARCH
+RUN apk add --no-cache clang gcc musl-dev zlib-dev
 WORKDIR /app
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
-COPY ["demo-jit-api/demo-jit-api.csproj", "demo-jit-api/"]
-RUN dotnet restore "demo-jit-api/demo-jit-api.csproj"
+COPY *.csproj ./
+RUN dotnet restore *.csproj -r linux-musl-${TARGETARCH:-x64}
 COPY . .
-RUN dotnet build "demo-jit-api/demo-jit-api.csproj" -c Release -o /app/build
-RUN dotnet publish "demo-jit-api/demo-jit-api.csproj" -c Release -o /app/publish /p:PublishSingleFile=true /p:RuntimeIdentifier=linux-x64
+RUN dotnet publish *.csproj -c Release -r linux-musl-${TARGETARCH:-x64} -o /app/publish \
+  --no-restore \
+  --self-contained true \
+  /p:PublishTrimmed=true \
+  /p:PublishSingleFile=true
+RUN ls -la /app/publish
 
+# Runtime stage
 FROM alpine:3.18 AS runner
-ENV ASPNETCORE_ENVIRONMENT=Production
-COPY --from=build /app/publish .
-ENTRYPOINT ["/app/demo-jit-api"]
+EXPOSE 80
+RUN apk add --no-cache \
+  libstdc++ \
+  libgcc \
+  tini \
+  && addgroup -S appgroup && adduser -S -G appgroup appuser
+COPY --from=build --chown=appuser:appgroup /app/publish /app/
+USER appuser
+WORKDIR /app
+ENV ASPNETCORE_ENVIRONMENT=Production \
+  ASPNETCORE_URLS=http://+:80 \
+  DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["./demo-jit-api"]
