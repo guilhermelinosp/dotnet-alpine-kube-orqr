@@ -9,7 +9,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-app.MapGet("/api/aot/demo", () => new Todo[]
+app.MapGet("/api/aot", () => new Todo[]
 {
     new(1, "Walk the dog", DateOnly.FromDateTime(DateTime.Now)),
     new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
