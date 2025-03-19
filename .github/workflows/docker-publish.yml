@@ -1,13 +1,11 @@
-name: Build and Push Docker Images
-
 on:
   schedule:
-    - cron: '32 5 * * *' # Runs daily at 5:32 AM UTC
+    - cron: "32 5 * * *" # Runs daily at 5:32 AM UTC
   push:
-    branches: [ "master" ]
-    tags: [ 'v*.*.*' ] # Publish semver tags as releases
+    branches: ["master"]
+    tags: ["v*.*.*"] # Publish semver tags as releases
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 env:
   REGISTRY: ghcr.io
@@ -19,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [ "aot", "jit" ] # Build both aot and jit variants
+        app: ["aot", "jit"] # Build both aot and jit variants
 
     permissions:
       contents: read
@@ -34,7 +32,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
         with:
-          cosign-release: 'v2.2.4'
+          cosign-release: "v2.2.4"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
@@ -52,7 +50,12 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}
-          # Append app name (aot or jit) to image name
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha
+            latest # Explicitly adds the "latest" tag
 
       - name: Build and push Docker image
         id: build-and-push
