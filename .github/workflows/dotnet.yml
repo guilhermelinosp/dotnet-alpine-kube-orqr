@@ -1,23 +1,51 @@
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: |
+          dotnet test --no-build \
+                      --configuration Release \
+                      --verbosity normal \
+                      --collect:"XPlat Code Coverage" \
+                      --results-directory ./coverage
+
+      - name: Upload coverage reports
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage
+          path: ./coverage/**/*.xml
+          retention-days: 7
+
+      - name: Check test results
+        if: failure()
+        run: |
+          echo "Tests failed. Please review the logs above."
+          exit 1
