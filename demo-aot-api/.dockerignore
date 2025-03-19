@@ -1,0 +1,39 @@
+﻿# Ignore .env and .git files
+**/.env
+**/.git
+**/.project
+**/.settings
+**/.toolstarget
+
+# Ignore Visual Studio and IDE files
+**/.vs
+**/.vscode
+**/.idea
+
+# Ignore user-specific project files (including .user and .dbmdl)
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+
+# Ignore Azure Dev Spaces files
+**/azds.yaml
+
+# Ignore compiled binaries and obj folders
+**/bin
+**/obj
+
+# Ignore sensitive or configuration files
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Ignore package manager files
+**/node_modules
+**/npm-debug.log
+
+# Ignore Docker and related config files
+**/docker-compose*
+**/Dockerfile*
+
+# Other project metadata (LICENSE and README can be included in image)
+LICENSE
+README.md

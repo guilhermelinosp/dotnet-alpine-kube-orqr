@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-aot-api-service
+  labels:
+    app: demo-aot-api
+spec:
+  selector:
+    app: demo-aot-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: demo-aot-api-rs
+  labels:
+    app: demo-aot-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: demo-aot-api
+  template:
+    metadata:
+      labels:
+        app: demo-aot-api
+    spec:
+      containers:
+        - name: demo-aot-api
+          image: ghcr.io/guilhermelinosp/demo-aot-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
