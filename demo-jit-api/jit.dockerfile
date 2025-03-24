@@ -2,7 +2,7 @@
 WORKDIR /app
 
 COPY *.csproj ./
-RUN dotnet restore -r linux-x64
+RUN dotnet restore *.csproj -r linux-x64
 
 COPY . .
 RUN dotnet publish *.csproj -c Release -r linux-x64 -o /app/publish \
@@ -10,23 +10,23 @@ RUN dotnet publish *.csproj -c Release -r linux-x64 -o /app/publish \
     /p:UseAppHost=true \
     /p:PublishSingleFile=true \
     /p:PublishTrimmed=true \
-    /p:SelfContained=true 
+    /p:StripSymbols=true \
+    /p:OptimizationPreference=Size
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runner
-WORKDIR /app
-
-RUN useradd -ms /bin/bash appuser
-USER appuser
-
+FROM alpine:3.21 AS runner
 EXPOSE 80
-
-COPY --from=build /app/publish/demo-jit-api /app/demo-jit-api
-COPY --from=build /app/appsettings.json /app/appsettings.json
-
+RUN apk add --no-cache \
+    libstdc++ \
+    libgcc \
+    libc6-compat \
+    && addgroup -S appgroup \
+    && adduser -S -G appgroup -h /app appuser
+COPY --from=build --chown=appuser:appgroup /app/publish/demo-jit-api /app/appsettings.json /app/
+USER appuser
+WORKDIR /app
 ENV ASPNETCORE_ENVIRONMENT=Production \
     ASPNETCORE_URLS="http://+:80" \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true \
     DOTNET_gcServer=1 \
     DOTNET_gcConcurrent=1
-
 ENTRYPOINT ["./demo-jit-api"]

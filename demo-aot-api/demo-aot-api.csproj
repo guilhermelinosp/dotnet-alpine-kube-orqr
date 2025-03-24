@@ -9,8 +9,4 @@
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
-    <ItemGroup>
-      <None Remove="Properties\launchSettings.json" />
-    </ItemGroup>
-
 </Project>
