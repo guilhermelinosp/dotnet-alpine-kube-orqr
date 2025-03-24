@@ -5,10 +5,12 @@
         <OutputType>Exe</OutputType>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>demo_aot_api</RootNamespace>
-        <InvariantGlobalization>true</InvariantGlobalization>
         <PublishAot>true</PublishAot>
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Properties\launchSettings.json" />
+    </ItemGroup>
 
 </Project>

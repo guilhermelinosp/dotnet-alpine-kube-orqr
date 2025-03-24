@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: demo-aot.local
+    - host: demo-aot-api.lan
       http:
         paths:
           - path: /

@@ -2,15 +2,11 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
-app.MapGet("/health", () => "Healthy");
+app.UseHealthChecks("/health");
 
 await app.RunAsync();

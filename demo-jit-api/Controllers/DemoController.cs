@@ -6,31 +6,15 @@ namespace demo_jit_api.Controllers;
 [Route("/api/jit")]
 public class DemoController : ControllerBase
 {
-    private static readonly string[] Summaries =
-    [
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    ];
-
-    [HttpGet()]
-    public IEnumerable<WeatherForecast> Get()
+    [HttpGet]
+    public IEnumerable<Todo> Get() => new Todo[]
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-    }
+        new(1, "Walk the dog", DateOnly.FromDateTime(DateTime.Now)),
+        new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
+        new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
+        new(4, "Clean the bathroom", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
+        new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
+    };
 }
 
-public class WeatherForecast
-{
-    public DateOnly Date { get; set; }
-
-    public int TemperatureC { get; set; }
-
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-
-    public string? Summary { get; set; }
-}
+public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);

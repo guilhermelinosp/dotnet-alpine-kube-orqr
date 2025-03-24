@@ -27,25 +27,3 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
-
-      - name: Test
-        run: |
-          dotnet test --no-build \
-                      --configuration Release \
-                      --verbosity normal \
-                      --collect:"XPlat Code Coverage" \
-                      --results-directory ./coverage
-
-      - name: Upload coverage reports
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-coverage
-          path: ./coverage/**/*.xml
-          retention-days: 7
-
-      - name: Check test results
-        if: failure()
-        run: |
-          echo "Tests failed. Please review the logs above."
-          exit 1

@@ -24,11 +24,6 @@ jobs:
             build-mode: none
           - language: csharp
             build-mode: autobuild
-          # Add more languages as needed, e.g.:
-          # - language: javascript-typescript
-          #   build-mode: autobuild
-          # - language: python
-          #   build-mode: none
 
     steps:
       - name: Checkout repository

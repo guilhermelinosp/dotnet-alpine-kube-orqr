@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: demo-aot-api
-          image: ghcr.io/guilhermelinosp/demo-aot-api:latest
+          image: ghcr.io/guilhermelinosp/dotnet-alpine-kube-orqr-aot:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
